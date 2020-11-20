@@ -43,6 +43,7 @@ import com.polidea.rxandroidble.scan.ScanSettings;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -406,6 +407,16 @@ public class BleModule implements BleAdapter {
 
         List<Device> localConnectedDevices = new ArrayList<>();
         for (Device device : connectedDevices.values()) {
+            for (UUID uuid : uuids) {
+                if (device.getServiceByUUID(uuid) != null) {
+                    localConnectedDevices.add(device);
+                    break;
+                }
+            }
+        }
+
+        for(RxBleDevice rxBleDevice : rxBleClient.getBondedDevices()){
+            Device device = rxBleDeviceToDeviceMapper.map(rxBleDevice);
             for (UUID uuid : uuids) {
                 if (device.getServiceByUUID(uuid) != null) {
                     localConnectedDevices.add(device);
