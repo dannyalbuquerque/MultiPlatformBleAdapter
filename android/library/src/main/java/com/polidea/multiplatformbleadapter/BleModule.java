@@ -389,44 +389,42 @@ public class BleModule implements BleAdapter {
         }
 
         if (serviceUUIDs.length == 0) {
-            onSuccessCallback.onSuccess(new Device[0]);
-            return;
+            throw new IllegalStateException("No service UUIDS given");
+            // onSuccessCallback.onSuccess(new Device[0]);
+            // return;
         }
 
-        UUID[] uuids = new UUID[serviceUUIDs.length];
-        for (int i = 0; i < serviceUUIDs.length; i++) {
-            UUID uuid = UUIDConverter.convert(serviceUUIDs[i]);
+        // UUID[] uuids = new UUID[serviceUUIDs.length];
+        // for (int i = 0; i < serviceUUIDs.length; i++) {
+        //     UUID uuid = UUIDConverter.convert(serviceUUIDs[i]);
 
-            if (uuid == null) {
-                onErrorCallback.onError(BleErrorUtils.invalidIdentifiers(serviceUUIDs));
-                return;
-            }
+        //     if (uuid == null) {
+        //         onErrorCallback.onError(BleErrorUtils.invalidIdentifiers(serviceUUIDs));
+        //         return;
+        //     }
 
-            uuids[i] = uuid;
-        }
+        //     uuids[i] = uuid;
+        // }
 
         List<Device> localConnectedDevices = new ArrayList<>();
-        for (Device device : connectedDevices.values()) {
-            for (UUID uuid : uuids) {
-                if (device.getServiceByUUID(uuid) != null) {
-                    localConnectedDevices.add(device);
-                    break;
-                }
-            }
+        // for (Device device : connectedDevices.values()) {
+        //     for (UUID uuid : uuids) {
+        //         if (device.getServiceByUUID(uuid) != null) {
+        //             localConnectedDevices.add(device);
+        //             break;
+        //         }
+        //     }
+        // }
+        List<RxBleDevice> bondedDevices = rxBleClient.getBondedDevices();
+        if (bondedDevices.length == 0) {
+            throw new IllegalStateException("No bonded devices present");
         }
-
-        for(RxBleDevice rxBleDevice : rxBleClient.getBondedDevices()){
+        for(RxBleDevice rxBleDevice : bondedDevices){
             Device device = rxBleDeviceToDeviceMapper.map(rxBleDevice);
-            // for (UUID uuid : uuids) {
-            //     if (device.getServiceByUUID(uuid) != null) {
-                    localConnectedDevices.add(device);
-                    //break;
-            //     }
-            // }
+            localConnectedDevices.add(device);
         }
 
         onSuccessCallback.onSuccess(localConnectedDevices.toArray(new Device[localConnectedDevices.size()]));
-
     }
 
     @Override
