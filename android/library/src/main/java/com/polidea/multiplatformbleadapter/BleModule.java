@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.SparseArray;
+import android.util.Log;
 
 import com.polidea.multiplatformbleadapter.errors.BleError;
 import com.polidea.multiplatformbleadapter.errors.BleErrorCode;
@@ -59,6 +60,8 @@ import rx.schedulers.Schedulers;
 import static com.polidea.multiplatformbleadapter.utils.Constants.BluetoothState;
 
 public class BleModule implements BleAdapter {
+
+    static final String TAG = BleModule.class.getName();
 
     private final ErrorConverter errorConverter = new ErrorConverter();
 
@@ -384,7 +387,8 @@ public class BleModule implements BleAdapter {
     public void getConnectedDevices(String[] serviceUUIDs,
                                     OnSuccessCallback<Device[]> onSuccessCallback,
                                     OnErrorCallback onErrorCallback) {
-        if (rxBleClient == null) {
+         Log.d(TAG, "getConnectedDevices");
+         if (rxBleClient == null) {
             throw new IllegalStateException("BleManager not created when tried to get connected devices");
         }
 
@@ -415,8 +419,8 @@ public class BleModule implements BleAdapter {
         //         }
         //     }
         // }
-        List<RxBleDevice> bondedDevices = rxBleClient.getBondedDevices();
-        if (bondedDevices.length == 0) {
+        Set<RxBleDevice> bondedDevices = rxBleClient.getBondedDevices();
+        if (bondedDevices.size() == 0) {
             throw new IllegalStateException("No bonded devices present");
         }
         for(RxBleDevice rxBleDevice : bondedDevices){
