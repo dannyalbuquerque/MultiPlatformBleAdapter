@@ -426,7 +426,7 @@ public class BleModule implements BleAdapter {
         for(RxBleDevice rxBleDevice : bondedDevices){
             BluetoothDevice bluetoothDevice = rxBleDevice.getBluetoothDevice();
             ParcelUuid[] deviceParcelUuids = bluetoothDevice.getUuids();
-            List<String> deviceUuids = Arrays.asList(deviceParcelUuids);
+            List<ParcelUuid> deviceUuids = Arrays.asList(deviceParcelUuids);
             for (UUID uuid : uuids) {
                 if (deviceUuids.contains(uuid)) {
                     Device device = rxBleDeviceToDeviceMapper.map(rxBleDevice);
