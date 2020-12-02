@@ -13,6 +13,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.SparseArray;
+import android.util.Log;
 
 import com.polidea.multiplatformbleadapter.errors.BleError;
 import com.polidea.multiplatformbleadapter.errors.BleErrorCode;
@@ -384,6 +385,7 @@ public class BleModule implements BleAdapter {
     public void getConnectedDevices(String[] serviceUUIDs,
                                     OnSuccessCallback<Device[]> onSuccessCallback,
                                     OnErrorCallback onErrorCallback) {
+        Log.d(TAG, "getConnectedDevices from BleModule (MultiPlatformBleAdapter)");
         if (rxBleClient == null) {
             throw new IllegalStateException("BleManager not created when tried to get connected devices");
         }
@@ -423,7 +425,6 @@ public class BleModule implements BleAdapter {
             Device device = rxBleDeviceToDeviceMapper.map(rxBleDevice);
             localConnectedDevices.add(device);
         }
-
         onSuccessCallback.onSuccess(localConnectedDevices.toArray(new Device[localConnectedDevices.size()]));
     }
 
