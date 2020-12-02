@@ -15,7 +15,6 @@ import android.support.annotation.RequiresApi;
 import android.util.SparseArray;
 import android.util.Log;
 import android.bluetooth.BluetoothDevice;
-import android.os.ParcelUuid;
 
 import com.polidea.multiplatformbleadapter.errors.BleError;
 import com.polidea.multiplatformbleadapter.errors.BleErrorCode;
@@ -427,9 +426,14 @@ public class BleModule implements BleAdapter {
             BluetoothDevice bluetoothDevice = rxBleDevice.getBluetoothDevice();
             ParcelUuid[] deviceParcelUuids = bluetoothDevice.getUuids();
             if(deviceParcelUuids != null){
-                Log.d(TAG, "deviceParcelUuids not null");
-                List<ParcelUuid> deviceUuids = Arrays.asList(deviceParcelUuids);
+                Log.d(TAG, "deviceParcelUuids not null, size:"+deviceParcelUuids.length+", device: "+bluetoothDevice.getName());
+                List<UUID> deviceUuids = new ArrayList<>();
+                for(ParcelUuid parcelUuid : deviceParcelUuids){
+                    Log.d(TAG, "parcelUuid: "+parcelUuid.toString());
+                    deviceUuids.add(parcelUuid.getUuid());
+                }
                 for (UUID uuid : uuids) {
+                    Log.d(TAG, "uuid: "+uuid.toString());
                     if (deviceUuids.contains(uuid)) {
                         Device device = rxBleDeviceToDeviceMapper.map(rxBleDevice);
                         localConnectedDevices.add(device);
