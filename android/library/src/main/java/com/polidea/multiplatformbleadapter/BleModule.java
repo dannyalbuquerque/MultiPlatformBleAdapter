@@ -1,6 +1,7 @@
 package com.polidea.multiplatformbleadapter;
 
 import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattDescriptor;
 import android.bluetooth.BluetoothGattService;
@@ -424,7 +425,12 @@ public class BleModule implements BleAdapter {
         Set<RxBleDevice> bondedDevices = rxBleClient.getBondedDevices();
         for(RxBleDevice rxBleDevice : bondedDevices){
             BluetoothDevice bluetoothDevice = rxBleDevice.getBluetoothDevice();
-            bluetoothDevice.fetchUuidsWithSdp();
+            BluetoothClass bluetoothClass = bluetoothDevice.getBluetoothClass();
+            if(bluetoothClass != null){
+                Log.d(TAG, bluetoothClass.toString());
+                Log.d(TAG, "Device class: "+bluetoothClass.getDeviceClass());
+                Log.d(TAG, "Major device class: "+bluetoothClass.getMajorDeviceClass());
+            }
             ParcelUuid[] deviceParcelUuids = bluetoothDevice.getUuids();
             if(deviceParcelUuids != null){
                 Log.d(TAG, "deviceParcelUuids not null, size:"+deviceParcelUuids.length+", device: "+bluetoothDevice.getName());
