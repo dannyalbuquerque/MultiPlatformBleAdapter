@@ -14,6 +14,8 @@ import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.SparseArray;
 import android.util.Log;
+import android.bluetooth.BluetoothDevice;
+import android.os.ParcelUuid;
 
 import com.polidea.multiplatformbleadapter.errors.BleError;
 import com.polidea.multiplatformbleadapter.errors.BleErrorCode;
@@ -47,6 +49,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.Arrays;
 
 import rx.Observable;
 import rx.Observer;
@@ -393,40 +396,46 @@ public class BleModule implements BleAdapter {
         }
 
         if (serviceUUIDs.length == 0) {
-            throw new IllegalStateException("No service UUIDS given");
-            // onSuccessCallback.onSuccess(new Device[0]);
-            // return;
+            onSuccessCallback.onSuccess(new Device[0]);
+            return;
         }
 
-        // UUID[] uuids = new UUID[serviceUUIDs.length];
-        // for (int i = 0; i < serviceUUIDs.length; i++) {
-        //     UUID uuid = UUIDConverter.convert(serviceUUIDs[i]);
+        UUID[] uuids = new UUID[serviceUUIDs.length];
+        for (int i = 0; i < serviceUUIDs.length; i++) {
+            UUID uuid = UUIDConverter.convert(serviceUUIDs[i]);
 
-        //     if (uuid == null) {
-        //         onErrorCallback.onError(BleErrorUtils.invalidIdentifiers(serviceUUIDs));
-        //         return;
-        //     }
+            if (uuid == null) {
+                onErrorCallback.onError(BleErrorUtils.invalidIdentifiers(serviceUUIDs));
+                return;
+            }
 
-        //     uuids[i] = uuid;
-        // }
+            uuids[i] = uuid;
+        }
 
         List<Device> localConnectedDevices = new ArrayList<>();
-        // for (Device device : connectedDevices.values()) {
-        //     for (UUID uuid : uuids) {
-        //         if (device.getServiceByUUID(uuid) != null) {
-        //             localConnectedDevices.add(device);
-        //             break;
-        //         }
-        //     }
-        // }
+        for (Device device : connectedDevices.values()) {
+            for (UUID uuid : uuids) {
+                if (device.getServiceByUUID(uuid) != null) {
+                    localConnectedDevices.add(device);
+                    break;
+                }
+            }
+        }
+
         Set<RxBleDevice> bondedDevices = rxBleClient.getBondedDevices();
-        if (bondedDevices.size() == 0) {
-            throw new IllegalStateException("No bonded devices present");
-        }
         for(RxBleDevice rxBleDevice : bondedDevices){
-            Device device = rxBleDeviceToDeviceMapper.map(rxBleDevice);
-            localConnectedDevices.add(device);
+            BluetoothDevice bluetoothDevice = rxBleDevice.getBluetoothDevice();
+            ParcelUuid[] deviceParcelUuids = bluetoothDevice.getUuids();
+            List<String> deviceUuids = Arrays.asList(deviceParcelUuids);
+            for (UUID uuid : uuids) {
+                if (deviceUuids.contains(uuid)) {
+                    Device device = rxBleDeviceToDeviceMapper.map(rxBleDevice);
+                    localConnectedDevices.add(device);
+                    break;
+                }
+            }
         }
+
         onSuccessCallback.onSuccess(localConnectedDevices.toArray(new Device[localConnectedDevices.size()]));
     }
 
