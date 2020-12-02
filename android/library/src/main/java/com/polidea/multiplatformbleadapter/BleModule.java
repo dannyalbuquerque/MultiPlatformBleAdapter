@@ -417,12 +417,12 @@ public class BleModule implements BleAdapter {
 
         for(RxBleDevice rxBleDevice : rxBleClient.getBondedDevices()){
             Device device = rxBleDeviceToDeviceMapper.map(rxBleDevice);
-            for (UUID uuid : uuids) {
-                if (device.getServiceByUUID(uuid) != null) {
+            // for (UUID uuid : uuids) {
+            //     if (device.getServiceByUUID(uuid) != null) {
                     localConnectedDevices.add(device);
-                    break;
-                }
-            }
+                    //break;
+            //     }
+            // }
         }
 
         onSuccessCallback.onSuccess(localConnectedDevices.toArray(new Device[localConnectedDevices.size()]));
